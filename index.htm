@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>সংখ্যাকে কথায় প্রকাশ</title>  <style>
+    textarea {
+      width: 80%;
+    }
+  </style>
+</head>
+<body>
+<h1>সংখ্যাকে কথায় প্রকাশ করুন</h1>
+
+<label for="input">এখানে আপনার টাকার অংকটি লিখুন:</label>
+<textarea id="input"></textarea>
+
+<button onclick="process()">প্রসেস করুন</button>
+
+<div class="output-container">
+  <div class="output-field">
+    <label for="Shongkha">কমা দিয়ে সংখ্যাটি:</label>
+    <input id="Shongkha-output"></input>
+  </div>
+  
+  <div class="output-field">
+    <label for="short-output">বাংলায় সংখ্যাটি:</label>
+    <input id="short-output"></input>
+  </div>
+
+  <div class="output-field">
+    <label for="output">কথার রূপ:</label>
+    <div id="output-scrollable">
+      <textarea id="output"></textarea>
+    </div>
+  </div>
+</div>
+
+
+
+  <script>
+function convertToBanglaNumber(number) {
+  const banglaDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+  const englishNumber = number.toString();
+  let banglaNumber = "";
+
+  for (let i = 0; i < englishNumber.length; i++) {
+    const digit = englishNumber[i];
+    if (digit >= "0" && digit <= "9") {
+      banglaNumber += banglaDigits[digit];
+    } else {
+      banglaNumber += digit;
+    }
+  }
+
+  return banglaNumber;
+}
+function addCommas(num) {
+  let str = num.toString();
+  let result = '';
+  let count = 0;
+
+  for (let i = str.length - 1; i >= 0; i--) {
+    if (count === 3 || (count > 3 && (count - 3) % 2 === 0)) {
+      result = ',' + result;
+    }
+    result = str[i] + result;
+    count++;
+  }
+
+  return result;
+}
+    function process() {
+      // Get the input value from the first textarea
+      var input = document.getElementById("input").value;
+
+
+      // Set the output value in the second textarea
+      document.getElementById("Shongkha-output").value= addCommas(input);
+      document.getElementById("short-output").value=addCommas(convertToBanglaNumber(input));
+
+      document.getElementById("output").value = CurrencyToBangla(input);
+
+    }
+  </script>
+</body>
+</html><script>
+
+function CurrencyToBangla(MyNumber) {
+  var Temp;
+  var Taka = '';
+  var Poisha = '';
+  var DecimalPlace, Count;
+  var Place = ['', '',' হাজার ', ' লাখ ', ' কোটি ', 'শত ', ' হাজার ', ' লাখ ', ' কোটি '];
+
+  MyNumber = String(MyNumber).trim();
+  DecimalPlace = MyNumber.indexOf('.');
+  if (DecimalPlace > 0) {
+    Temp = (MyNumber.substring(DecimalPlace + 1) + '00').substring(0, 2);
+    Poisha = ConvertTens(Temp);
+    MyNumber = MyNumber.substring(0, DecimalPlace);
+  }
+  Count = 1;
+  while (MyNumber !== '') {
+    if (Count === 1) {
+      Temp = ConvertHundreds(MyNumber.slice(-3));
+      if (Temp !== '') Taka = Temp + Place[Count] + Taka;
+      if (MyNumber.length > 3) {
+        MyNumber = MyNumber.slice(0, -3);
+      } else {
+        MyNumber = '';
+      }
+      Count++;
+    } else {
+      if (MyNumber.length === 1) {
+        Temp = ConvertDigit(MyNumber);
+      } else {
+        Temp = ConvertTens(MyNumber.slice(-2));
+      }
+      if (Temp !== '') Taka = Temp + Place[Count] + Taka;
+      if (MyNumber.length >= 3) {
+        MyNumber = MyNumber.slice(0, -2);
+      } else {
+        MyNumber = '';
+      }
+      Count++;
+    }
+  }
+  switch (Taka) {
+    case "":Taka = "";break;
+    default:Taka += " টাকা";break;
+  }
+  switch (Poisha) {
+    case "":Poisha = "";break;
+    default:Poisha = " এবং " + Poisha + " পয়সা";break;
+  }
+  return Taka + Poisha;
+}
+function ConvertDigit(Digit) {
+  var BanglaDigit = ['', 'এক', 'দুই', 'তিন', 'চার', 'পাঁচ', 'ছয়', 'সাত', 'আট', 'নয়'];
+  return BanglaDigit[parseInt(Digit)];
+}
+
+function ConvertHundreds(MyNumber) {
+  var Result = "";
+  if (parseInt(MyNumber) === 0) {
+    return "";
+  }
+
+ MyNumber = ("000" + MyNumber).substr(-3);
+
+  if (MyNumber.substr(0, 1) !== "0") {
+    Result = ConvertDigit(MyNumber.substr(0, 1)) + "শত ";
+  }
+
+  if (MyNumber.substr(1, 1) !== "0") {
+    Result += ConvertTens(MyNumber.substr(1));
+  } else {
+    Result += ConvertDigit(MyNumber.substr(2));
+  }
+  return Result.trim();
+}
+function ConvertTens(MyTens) {
+    var Result = "";
+  if (parseInt(MyTens.substring(0, 1)) == 1) {
+    switch (parseInt(MyTens)) {
+      case 1: Result = "এক"; break;
+      case 10: Result = "দশ"; break;
+      case 11: Result = "এগারো"; break;
+      case 12: Result = "বারো"; break;
+      case 13: Result = "তেরো"; break;
+      case 14: Result = "চৌদ্দ"; break;
+      case 15: Result = "পনেরো"; break;
+      case 16: Result = "ষোলো"; break;
+      case 17: Result = "সতেরো"; break;
+      case 18: Result = "আঠেরো"; break;
+      case 19: Result = "ঊনিশ"; break;
+    }
+  }
+  else if (parseInt(MyTens.substring(0, 1)) == 2) {
+    switch (parseInt(MyTens)) {
+      case 2: Result = "দুই"; break;
+      case 20: Result = "কুড়ি"; break;
+      case 21: Result = "একুশ"; break;
+      case 22: Result = "বাইশ"; break;
+      case 23: Result = "তেইশ"; break;
+      case 24: Result = "চব্বিশ"; break;
+      case 25: Result = "পঁচিশ"; break;
+      case 26: Result = "ছাব্বিশ"; break;
+      case 27: Result = "সাতাশ"; break;
+      case 28: Result = "আঠাশ"; break;
+      case 29: Result = "ঊনত্রিশ"; break;
+    }
+  }
+  else if (parseInt(MyTens.substring(0, 1)) == 3) {
+    switch (parseInt(MyTens)) {
+      case 3: Result = "তিন"; break;
+      case 30: Result = "ত্রিশ"; break;
+      case 31: Result = "একত্রিশ"; break;
+      case 32: Result = "বত্রিশ"; break;
+      case 33: Result = "তেত্রিশ"; break;
+      case 34: Result = "চৌত্রিশ"; break;
+      case 35: Result = "পঁয়ত্রিশ"; break;
+      case 36: Result = "ছত্রিশ"; break;
+      case 37: Result = "সাইত্রিশ"; break;
+      case 38: Result = "আটত্রিশ"; break;
+      case 39: Result = "ঊনচল্লিশ"; break;
+    }
+  }
+  else if (parseInt(MyTens.substring(0, 1)) == 4) {
+    switch (parseInt(MyTens)) {
+      case 4: Result = "চার"; break;
+      case 40: Result = "চল্লিশ"; break;
+      case 41: Result = "একচল্লিশ"; break;
+      case 42: Result = "বিয়াল্লিশ"; break;
+      case 43: Result = "তেতাল্লিশ"; break;
+      case 44: Result = "চুয়াল্লিশ"; break;
+      case 45: Result = "পঁয়তাল্লিশ"; break;
+      case 46: Result = "ছিচল্লিশ"; break;
+      case 47: Result = "সাতচল্লিশ"; break;
+      case 48: Result = "আটচল্লিশ"; break;
+      case 49: Result = "ঊনপঞ্চাশ"; break;
+    }
+  }
+    else if (parseInt(MyTens.substring(0, 1)) == 5) {
+    switch (parseInt(MyTens)) {
+      case 5: Result = "পাঁচ"; break;
+      case 50: Result = "পঞ্চাশ"; break;
+      case 51: Result = "একান্ন"; break;
+      case 52: Result = "বায়ান্নো"; break;
+      case 53: Result = "তেপ্পান্নো"; break;
+      case 54: Result = "চুয়ান্নো"; break;
+      case 55: Result = "পঞ্চান্নো"; break;
+      case 56: Result = "ছাপ্পান্নো"; break;
+      case 57: Result = "সাতান্নো"; break;
+      case 58: Result = "আটান্নো"; break;
+      case 59: Result = "ঊনষাট"; break;
+    }
+  }
+    else if (parseInt(MyTens.substring(0, 1)) == 6) {
+    switch (parseInt(MyTens)) {
+      case 6: Result = "ছয়"; break;
+      case 60: Result = "ষাট"; break;
+      case 61: Result = "একষট্টি"; break;
+      case 62: Result = "বাষট্টি"; break;
+      case 63: Result = "তেষট্টি"; break;
+      case 64: Result = "চৌষট্টি"; break;
+      case 65: Result = "পঁয়ষট্টি"; break;
+      case 66: Result = "ছেষট্টি"; break;
+      case 67: Result = "সাতষট্টি"; break;
+      case 68: Result = "আটষট্টি"; break;
+      case 69: Result = "ঊনসত্তর"; break;
+    }
+  }
+    else if (parseInt(MyTens.substring(0, 1)) == 7) {
+    switch (parseInt(MyTens)) {
+      case 7: Result = "সাত"; break;
+      case 70: Result = "সত্তর"; break;
+      case 71: Result = "একাত্তর"; break;
+      case 72: Result = "বায়াত্তর"; break;
+      case 73: Result = "তিয়াত্তর"; break;
+      case 74: Result = "চুয়াত্তর"; break;
+      case 75: Result = "পঁচাত্তর"; break;
+      case 76: Result = "ছিয়াত্তর"; break;
+      case 77: Result = "সাতাত্তর"; break;
+      case 78: Result = "আটাত্তর"; break;
+      case 79: Result = "ঊনআশি"; break;
+    }
+  }
+    else if (parseInt(MyTens.substring(0, 1)) == 8) {
+    switch (parseInt(MyTens)) {
+      case 8: Result = "আট"; break;
+      case 80: Result = "আশি"; break;
+      case 81: Result = "একাশি"; break;
+      case 82: Result = "বিরাশি"; break;
+      case 83: Result = "তেরাশি"; break;
+      case 84: Result = "চুরাশি"; break;
+      case 85: Result = "পঁচাশি"; break;
+      case 86: Result = "ছিয়াশি"; break;
+      case 87: Result = "সাতাশি"; break;
+      case 88: Result = "আটাশি"; break;
+      case 89: Result = "ঊননব্বই"; break;
+    }
+  }
+    else if (parseInt(MyTens.substring(0, 1)) == 9) {
+    switch (parseInt(MyTens)) {
+      case 9: Result = "নয়"; break;
+      case 90: Result = "নব্বই"; break;
+      case 91: Result = "একানব্বই"; break;
+      case 92: Result = "বিরানব্বই"; break;
+      case 93: Result = "তেরানব্বই"; break;
+      case 94: Result = "চুরানব্বই"; break;
+      case 95: Result = "পঁচানব্বই"; break;
+      case 96: Result = "ছিয়ানব্বই"; break;
+      case 97: Result = "সাতানব্বই"; break;
+      case 98: Result = "আটানব্বই"; break;
+      case 99: Result = "নিরানব্বই"; break;
+      }
+    }
+else
+    Result +=  ConvertDigit(MyTens.substring(0, 1))
+return Result;
+}</script>
